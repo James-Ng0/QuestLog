@@ -10,8 +10,8 @@ const QuestDetailsModal = ({ id, getQuest, setQuest, setQuestModalShowing }) => 
     if(quest==null){
         return(null);
     }
-    const [title, setTitle] = useState(quest.title)
-    const [description, setDescription] = useState(quest.text)
+    const [title, setTitle] = useState(quest.title == undefined ? "" : quest.title)
+    const [description, setDescription] = useState(quest.text == undefined ? "" : quest.text)
 
     const confirm = () => {
         if(title != ""){

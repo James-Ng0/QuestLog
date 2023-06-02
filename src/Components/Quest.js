@@ -12,10 +12,7 @@ const Quest = ({ title, text = "", id, parentID = 0, subQuests = [], level = 0, 
     const tap = () => {
         setExpanded(!expanded);
     }
-
-    const edit = () => {
-    }
-
+    
     const delQuest = () => {
         deleteQ(id);
         let row = rows.filter(r => r.ID == id)

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 
 const styles = StyleSheet.create({
     main: {
@@ -14,14 +15,14 @@ const styles = StyleSheet.create({
   
     titleCard: {
       height: 100,
+      width:400,
+      alignItems:'center',
       backgroundColor: '#000',
       borderColor: 'white',
       fontSize: 40,
       color: '#fff',
-      alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 5,
-      alignSelf: "stretch",
       borderLeftWidth: 0,
       borderRightWidth: 0,
       borderTopWidth: 0,
@@ -49,7 +50,9 @@ const styles = StyleSheet.create({
         alignContent: 'stretch',
         marginBottom:'5%'
     },
-
+    swipeCard: {
+        backgroundColor:'#fff'
+    },
   });
 
   
