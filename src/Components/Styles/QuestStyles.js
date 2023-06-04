@@ -3,7 +3,6 @@ const styles = StyleSheet.create({
     quest: {
         backgroundColor: 'black',
         borderColor: 'white',
-
         borderWidth: 10,
         alignSelf: "stretch",
         borderLeftWidth: 0,
@@ -43,16 +42,18 @@ const styles = StyleSheet.create({
 
     text: {
         fontSize: 20,
-        maxHeight: 200,
+        maxHeight: 100,
         alignSelf: 'flex-start',
-        paddingBottom: '5%',
+        paddingBottom: '0.5%',
+        marginRight: '3%', 
+        marginLeft: '3%',
     },
 
     header: {
         backgroundColor: 'black',
-        height: 100,
+        maxHeight: 100,
+        minHeight:100,
         justifyContent: 'center',
-        marginBottom: 0,
         
     },
     subQuestLog: {

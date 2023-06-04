@@ -4,7 +4,7 @@ import { Swipeable } from "react-native-gesture-handler";
 const styles = StyleSheet.create({
     main: {
       flex: 1,
-      backgroundColor: '#000',
+      backgroundColor: 'black',
       alignItems: 'center',
       justifyContent: 'center',
     },
