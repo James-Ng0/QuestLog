@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'white',
         height: '100%',
+        justifyContent:'center'
     },
 
     icon: {

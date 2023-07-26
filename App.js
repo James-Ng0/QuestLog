@@ -79,20 +79,24 @@ export default function App() {
   }
 
   const deleteQuest = () => {
-    let temp = JSON.parse(JSON.stringify(quests))
-    let quest = temp.filter(q => (q.id == currentQuestId))[0]
-    temp.splice(quests.indexOf(quest), 1)
+    let tempQuests = JSON.parse(JSON.stringify(quests))
+    let quest = getQuest(currentQuestId, tempQuests)
     let subQuests = getAllSubQuests(currentQuestId)
+    tempQuests.splice(tempQuests.indexOf(quest))
     subQuests.forEach((sQ) => {
-      temp.splice(temp.indexOf(sQ), 1)
+      tempQuests.splice(tempQuests.indexOf(sQ))
     })
-    updateQuestCompletion(temp)
+    //If quest has parent, update its completion
+    if(quest.parentID != 0){
+      updateQuestCompletion(quest.parentID, tempQuests)
+    }else{
+      setQuests(tempQuests)
+      setUpdated(updated * -1)
+    }
   }
 
   const toggleQuestCompletion = (questId) => {
-    console.log("Toggling")
     quests.forEach(q => {
-      console.log(q.id)
     })
     let temp = JSON.parse(JSON.stringify(quests))
     let quest = getQuest(questId, temp)
@@ -103,7 +107,6 @@ export default function App() {
       setQuests(temp)
       setUpdated(updated * -1)
     }
-    
   }
 
   //Bottom up method
@@ -111,12 +114,13 @@ export default function App() {
     let completion = 0
     let quest = getQuest(questId, tempQuests)
     let subQuests = getDirectSubQuestData(questId, tempQuests)
-
+    
     subQuests.forEach(sQ => {
       completion += sQ.completion / subQuests.length
     })
-      tempQuests[tempQuests.indexOf(quest)].completion = completion
-
+    if(tempQuests[tempQuests.indexOf(quest)] == undefined){
+    }
+    tempQuests[tempQuests.indexOf(quest)].completion = completion
     if (quest.parentID != 0) {
       updateQuestCompletion(quest.parentID, tempQuests)
     } else {
@@ -125,49 +129,18 @@ export default function App() {
     }
   }
 
-  //Top down method
-  //Go through children
-  //Calculate completion of children
-  //Return list of children and their updated completions
-  //If top level, apply changes 
-  const updateTotalCompletion = (id, tempQuests) => {
-    let completion = 0
-    let childCompletions = []
-    let directChildren = getDirectSubQuestData(id, tempQuests)
-
-    //Go through direct children
-    directChildren.forEach(c => {
-      //Get that child's completion
-      let childCompletion = updateTotalCompletion(c.id, tempQuests)
-      //Calculate completion based on child completion
-      completion += childCompletion[1]/directChildren.length
-      //Add child completion to current completion
-      childCompletions.concat(childCompletion)
-    })
-    let quest = getQuest(id, tempQuests)
-    childCompletions.push([id, directChildren.length == 0 ? quest.completion : completion])
-
-    if(quest.parentID != 0){
-      return(childCompletions)
-    }
-
-    childCompletions.forEach(cQ => {
-      let childQuest = getQuest(cq[0], tempQuests)
-      tempQuests[tempQuests.indexOf(childQuest)].completion = cq[1]
-    })
-    setQuests(temp)
-  }
 
   const UpdateDisplayedQuests = () => {
     let display = []
     quests.forEach(q => {
+      let parent = getTopLevelParent(q.id)
       if (active) {
-        if (getTopLevelParent(q.id).completion != 100) {
+        if (parent.completion != 100) {
           display.push(q)
         }
       }
       else {
-        if (getTopLevelParent(q.id).completion == 100) {
+        if (parent.completion == 100) {
           display.push(q)
         }
       }
@@ -175,12 +148,14 @@ export default function App() {
     setDisplayedQuests(display)
   }
 
-  const getTopLevelParent = (id) => {
-    let quest = getQuest(id)
-    if (quest.parentID != 0) {
-      return getTopLevelParent(quest.parentID)
+  const getTopLevelParent = (id, questList = quests) => {
+    let quest = getQuest(id, questList)
+    if (quest) {
+      if (quest.parentID != 0) {
+        return getTopLevelParent(quest.parentID)
+      }
+      return quest;
     }
-    return quest;
   }
 
   const parseQuest = (quest, ix, questLevel) => {
@@ -195,23 +170,42 @@ export default function App() {
   }
 
   const openQuestDetailsModal = (questId = 0, questParentId = 0) => {
+    if(deletionModalShowing){
+      return
+    }
     setCurrentQuestId(questId)
     setCurrentParentId(questParentId)
     setQuestModalShowing(true)
   }
 
   const openDeletionModal = (questId = 0) => {
+    if(questModalShowing){
+      return
+    }
     setCurrentQuestId(questId)
     setDeletionModalShowing(true)
   }
 
   const addQuest = (questTitle, description) => {
     let temp = JSON.parse(JSON.stringify(quests))
-    temp.push({ title: questTitle, text: description, id: temp.length + 1, parentID: currentParentId, completion: 0 })
-    setQuests(temp)
-    setUpdated(updated * -1)
+    let nextId = getNextAvailableId()
+    temp.push({ title: questTitle, text: description, id: nextId, parentID: currentParentId, completion: 0 })
+    if(currentParentId != 0){
+      updateQuestCompletion(currentParentId, temp)
+    }else{
+      setQuests(temp)
+      setUpdated(updated * -1)
+    }
   }
 
+  const getNextAvailableId = (questList = quests) => {
+    for(let i = 1; i <= questList.length + 1; i++){
+      if(!getQuest(i, questList)){
+        return i
+      }
+    }
+    return 1
+  }
   const getQuest = (questID, questList = quests) => {
     let matchingQuest = questList.filter(q => q.id == questID)
     if (matchingQuest.length > 0) {
@@ -238,8 +232,9 @@ export default function App() {
     let subQuests = []
     directChildren.forEach((sQ) => {
       subQuests.push(sQ)
-      subQuests.concat(getAllSubQuests(sQ.id))
+      subQuests = subQuests.concat(getAllSubQuests(sQ.id, questList))
     })
+    
     return subQuests;
   }
 

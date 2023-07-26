@@ -55,9 +55,9 @@ const Quest = ({ title, text = "", id, parentID = 0, subQuests = [], level = 0, 
                     <FontAwesomeIcon icon={faStar} style={styles.icon} size={30} />
                 </TouchableOpacity>}
 
-                <TouchableOpacity style={styles.button} onPress={addQuest}>
+                {level < 3 && <TouchableOpacity style={styles.button} onPress={addQuest}>
                     <FontAwesomeIcon icon={faPlus} style={styles.icon} size={30} />
-                </TouchableOpacity>
+                </TouchableOpacity>}
             </View>
         )
     }
